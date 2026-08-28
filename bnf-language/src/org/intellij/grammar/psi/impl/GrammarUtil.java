@@ -45,15 +45,17 @@ public class GrammarUtil {
 
   public static PsiElement getDummyAwarePrevSibling(PsiElement child) {
     PsiElement prevSibling = child.getPrevSibling();
+    if (prevSibling == null) {
+      PsiElement parent = child.getParent();
+      while (parent instanceof DummyBlockType.DummyBlock && parent.getPrevSibling() == null) {
+        parent = parent.getParent();
+      }
+      prevSibling = parent == null ? null : parent.getPrevSibling();
+    }
     while (prevSibling instanceof DummyBlockType.DummyBlock) {
       prevSibling = prevSibling.getLastChild();
     }
-    if (prevSibling != null) return prevSibling;
-    PsiElement parent = child.getParent();
-    while (parent instanceof DummyBlockType.DummyBlock && parent.getPrevSibling() == null) {
-      parent = parent.getParent();
-    }
-    return parent == null ? null : parent.getPrevSibling();
+    return prevSibling;
   }
 
   public static boolean equalsElement(BnfExpression e1, BnfExpression e2) {
